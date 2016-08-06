@@ -1,9 +1,11 @@
 package com.example.rohansharma.timetable.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
@@ -28,9 +30,11 @@ public class StreamChooserActivity extends AppCompatActivity {
 
         overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
 
+        setTitle("Select Stream");
+
         spinner = (Spinner) findViewById(R.id.spinner);
 
-        SharedPreferences sharedPreferences = getSharedPreferences(SIGN_IN, MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences(SIGN_IN, Context.MODE_PRIVATE);
         if (sharedPreferences.getBoolean(SIGNED_IN, false)) {
             stream = sharedPreferences.getInt(STREAM, 0);
             startActivity(new Intent(this, TimeTableActivity.class));
@@ -44,5 +48,15 @@ public class StreamChooserActivity extends AppCompatActivity {
                 android.R.layout.simple_spinner_item, list);
         arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(arrayAdapter);
+    }
+
+    public void onClickContinue(View v) {
+        SharedPreferences.Editor editor = getSharedPreferences(SIGN_IN, Context.MODE_PRIVATE).edit();
+        editor.putBoolean(SIGNED_IN, true);
+        editor.putInt(STREAM, spinner.getSelectedItemPosition());
+        editor.apply();
+
+        startActivity(new Intent(this, TimeTableActivity.class));
+        finish();
     }
 }

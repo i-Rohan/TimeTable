@@ -1,6 +1,5 @@
 package com.example.rohansharma.timetable.activity;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -61,12 +60,13 @@ public class TimeTableActivity extends AppCompatActivity {
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         updated = (TextView) findViewById(R.id.updated);
 
-        File file = new File(getFilesDir() + "/" + getPackageName() + "/databases/" + "timetable");
+        File file = new File("/data/data/" + '/' + getPackageName() + "/databases/" + "timetable");
         if (file.exists()) {
             timeTableExists = true;
             progressBar.setVisibility(View.GONE);
-            SharedPreferences sharedPreferences = this.getSharedPreferences(SIGN_IN,
+            SharedPreferences sharedPreferences = getSharedPreferences(SIGN_IN,
                     Context.MODE_PRIVATE);
+            stream = sharedPreferences.getInt("stream", 0);
             long temp = (System.currentTimeMillis() - sharedPreferences.getLong("updated", 0))
                     / (1000 * 3600 * 24);
             if (temp == 0)
@@ -201,7 +201,7 @@ public class TimeTableActivity extends AppCompatActivity {
                     ViewGroup.LayoutParams.MATCH_PARENT));
 
             for (int i = 0; i < 5; i++) {
-                SQLiteDatabase sqLiteDatabase = SQLiteDatabase.openDatabase(getFilesDir() + "/" +
+                SQLiteDatabase sqLiteDatabase = SQLiteDatabase.openDatabase("/data/data/" + '/' +
                                 getPackageName() + "/databases/timetable", null,
                         SQLiteDatabase.OPEN_READONLY);
                 Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM TimeTable WHERE STREAM='" +
@@ -276,8 +276,7 @@ public class TimeTableActivity extends AppCompatActivity {
             }
 
             Calendar calendar = Calendar.getInstance();
-            @SuppressLint("SimpleDateFormat")
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm");
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm");
             String time = simpleDateFormat.format(calendar.getTime());
 
             Log.d("TAG", time);
@@ -286,25 +285,9 @@ public class TimeTableActivity extends AppCompatActivity {
 
             for (int i = 9; i <= 16; i++) {
                 if (i == 9) {
-                    if ((time.compareTo("09:30") >= 0) && (time.compareTo((9 + 1) + ":30") <= 0)) {
+                    if ((time.compareTo("09:30") >= 0) && (time.compareTo("10:30") <= 0)) {
                         TextView textView = (TextView) findViewById(PERIOD_IDS[0]);
                         temp1 = PERIOD_IDS[0];
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                            if (textView != null) {
-                                textView.setBackground(ResourcesCompat.getDrawable(
-                                        getResources(), R.drawable.border3, null));
-                            }
-                            if (textView != null) {
-                                textView.setTextColor(Color.WHITE);
-                            }
-                        }
-                    }
-                }
-                if (i >= 12) {
-                    if ((time.compareTo("0" + (i - 12) + ":30") >= 0) &&
-                            (time.compareTo("0" + (i - 12 + 1) + ":30") <= 0)) {
-                        TextView textView = (TextView) findViewById(PERIOD_IDS[i - 9]);
-                        temp1 = PERIOD_IDS[i - 9];
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                             if (textView != null) {
                                 textView.setBackground(ResourcesCompat.getDrawable(
