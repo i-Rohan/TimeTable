@@ -1,4 +1,4 @@
-package com.example.rohansharma.timetable.activity;
+package com.fancy.packagename.rohansharma.timetable.activity;
 
 import android.content.Context;
 import android.content.Intent;
@@ -9,16 +9,16 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
-import com.example.rohansharma.timetable.R;
+import com.fancy.packagename.rohansharma.timetable.R;
 
 import java.util.ArrayList;
 import java.util.Collections;
 
-import static com.example.rohansharma.timetable.commons.AppCommons.SIGNED_IN;
-import static com.example.rohansharma.timetable.commons.AppCommons.SIGN_IN;
-import static com.example.rohansharma.timetable.commons.AppCommons.STREAM;
-import static com.example.rohansharma.timetable.commons.AppCommons.STREAMS;
-import static com.example.rohansharma.timetable.commons.AppCommons.stream;
+import static com.fancy.packagename.rohansharma.timetable.commons.AppCommons.SIGNED_IN;
+import static com.fancy.packagename.rohansharma.timetable.commons.AppCommons.SIGN_IN;
+import static com.fancy.packagename.rohansharma.timetable.commons.AppCommons.STREAM;
+import static com.fancy.packagename.rohansharma.timetable.commons.AppCommons.STREAMS;
+import static com.fancy.packagename.rohansharma.timetable.commons.AppCommons.stream;
 
 public class StreamChooserActivity extends AppCompatActivity {
     Spinner spinner;

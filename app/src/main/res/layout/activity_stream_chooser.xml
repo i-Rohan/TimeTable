@@ -13,35 +13,25 @@
         android:padding="25dp"
         android:weightSum="1">
 
-
-        <ImageView
-            android:id="@+id/imageView2"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:src="@drawable/bml_logo"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:layout_margin="50dp" />
-
         <Spinner
+            android:id="@+id/spinner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/spinner"
+            android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"
-            android:layout_below="@+id/imageView2" />
+            android:layout_marginTop="100dp" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@drawable/button_bg"
+            android:onClick="onClickContinue"
+            android:padding="5dp"
             android:text="Continue"
+            android:textColor="#fff"
             android:layout_below="@+id/spinner"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="25dp"
-            android:layout_marginBottom="9dp"
-            android:background="@drawable/button_bg"
-            android:textColor="#fff"
-            android:padding="5dp"
-            android:onClick="onClickContinue" />
+            android:layout_marginTop="50dp" />
 
     </RelativeLayout>
 </ScrollView>

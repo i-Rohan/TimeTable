@@ -1,0 +1,38 @@
+{
+  "project_info": {
+    "project_number": "435135921284",
+    "project_id": "firebase-time-table"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:435135921284:android:98022b12795265a7",
+        "android_client_info": {
+          "package_name": "com.fancy.packagename.rohansharma.timetable"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDj8vQKpmFXLJyAzQMYjxS4gpIyU-mqUis"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 2,
+          "analytics_property": {
+            "tracking_id": "UA-82126026-1"
+          }
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

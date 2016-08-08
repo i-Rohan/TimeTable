@@ -1,12 +1,20 @@
-package com.example.rohansharma.timetable.activity;
+package com.fancy.packagename.rohansharma.timetable.activity;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -25,7 +33,10 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.rohansharma.timetable.R;
+import com.fancy.packagename.rohansharma.timetable.R;
+import com.fancy.packagename.rohansharma.timetable.gcm.GCMRegistrationService;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -34,22 +45,31 @@ import org.json.JSONObject;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
-import static com.example.rohansharma.timetable.commons.AppCommons.API_URL;
-import static com.example.rohansharma.timetable.commons.AppCommons.DAYS;
-import static com.example.rohansharma.timetable.commons.AppCommons.DAY_IDS;
-import static com.example.rohansharma.timetable.commons.AppCommons.PERIOD_IDS;
-import static com.example.rohansharma.timetable.commons.AppCommons.SIGN_IN;
-import static com.example.rohansharma.timetable.commons.AppCommons.STREAMS;
-import static com.example.rohansharma.timetable.commons.AppCommons.stream;
+import cn.pedant.SweetAlert.SweetAlertDialog;
+
+import static cn.pedant.SweetAlert.SweetAlertDialog.OnSweetClickListener;
+import static cn.pedant.SweetAlert.SweetAlertDialog.WARNING_TYPE;
+import static com.fancy.packagename.rohansharma.timetable.commons.AppCommons.API_URL;
+import static com.fancy.packagename.rohansharma.timetable.commons.AppCommons.DAYS;
+import static com.fancy.packagename.rohansharma.timetable.commons.AppCommons.DAY_IDS;
+import static com.fancy.packagename.rohansharma.timetable.commons.AppCommons.PERIOD_IDS;
+import static com.fancy.packagename.rohansharma.timetable.commons.AppCommons.SIGN_IN;
+import static com.fancy.packagename.rohansharma.timetable.commons.AppCommons.STREAMS;
+import static com.fancy.packagename.rohansharma.timetable.commons.AppCommons.stream;
 
 public class TimeTableActivity extends AppCompatActivity {
+    public static String link;
     int id = 1;
     TableLayout tableLayout;
     SQLiteDatabase timeTable;
     ProgressBar progressBar;
     TextView updated;
     boolean timeTableExists;
+    boolean doubleBackToExitPressedOnce;
+    private BroadcastReceiver mRegistrationBroadcastReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +85,7 @@ public class TimeTableActivity extends AppCompatActivity {
             timeTableExists = true;
             progressBar.setVisibility(View.GONE);
             SharedPreferences sharedPreferences = getSharedPreferences(SIGN_IN,
-                    Context.MODE_PRIVATE);
+                    MODE_PRIVATE);
             stream = sharedPreferences.getInt("stream", 0);
             long temp = (System.currentTimeMillis() - sharedPreferences.getLong("updated", 0))
                     / (1000 * 3600 * 24);
@@ -87,7 +107,7 @@ public class TimeTableActivity extends AppCompatActivity {
             dayHeader.setGravity(Gravity.CENTER);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 dayHeader.setBackground(ResourcesCompat.getDrawable(getResources(),
-                        R.drawable.border6, null));
+                        R.drawable.border1, null));
                 dayHeader.setTextColor(Color.WHITE);
             }
             dayHeader.setPadding(16, 16, 16, 16);
@@ -99,12 +119,11 @@ public class TimeTableActivity extends AppCompatActivity {
             p1Header.setGravity(Gravity.CENTER);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 p1Header.setBackground(ResourcesCompat.getDrawable(getResources(),
-                        R.drawable.border6, null));
+                        R.drawable.border1, null));
                 p1Header.setTextColor(Color.WHITE);
             }
             p1Header.setPadding(16, 16, 16, 16);
             trHead.addView(p1Header);
-            Log.d("id", String.valueOf(id));
 
             TextView p2Header = new TextView(this);
             p2Header.setId(id++);
@@ -112,12 +131,11 @@ public class TimeTableActivity extends AppCompatActivity {
             p2Header.setGravity(Gravity.CENTER);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 p2Header.setBackground(ResourcesCompat.getDrawable(getResources(),
-                        R.drawable.border6, null));
+                        R.drawable.border1, null));
                 p2Header.setTextColor(Color.WHITE);
             }
             p2Header.setPadding(16, 16, 16, 16);
             trHead.addView(p2Header);
-            Log.d("id", String.valueOf(id));
 
             TextView p3Header = new TextView(this);
             p3Header.setId(id++);
@@ -125,12 +143,11 @@ public class TimeTableActivity extends AppCompatActivity {
             p3Header.setGravity(Gravity.CENTER);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 p3Header.setBackground(ResourcesCompat.getDrawable(getResources(),
-                        R.drawable.border6, null));
+                        R.drawable.border1, null));
                 p3Header.setTextColor(Color.WHITE);
             }
             p3Header.setPadding(16, 16, 16, 16);
             trHead.addView(p3Header);
-            Log.d("id", String.valueOf(id));
 
             TextView p4Header = new TextView(this);
             p4Header.setId(id++);
@@ -138,12 +155,11 @@ public class TimeTableActivity extends AppCompatActivity {
             p4Header.setGravity(Gravity.CENTER);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 p4Header.setBackground(ResourcesCompat.getDrawable(getResources(),
-                        R.drawable.border6, null));
+                        R.drawable.border1, null));
                 p4Header.setTextColor(Color.WHITE);
             }
             p4Header.setPadding(16, 16, 16, 16);
             trHead.addView(p4Header);
-            Log.d("id", String.valueOf(id));
 
             TextView p5Header = new TextView(this);
             p5Header.setId(id++);
@@ -151,12 +167,11 @@ public class TimeTableActivity extends AppCompatActivity {
             p5Header.setGravity(Gravity.CENTER);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 p5Header.setBackground(ResourcesCompat.getDrawable(getResources(),
-                        R.drawable.border6, null));
+                        R.drawable.border1, null));
                 p5Header.setTextColor(Color.WHITE);
             }
             p5Header.setPadding(16, 16, 16, 16);
             trHead.addView(p5Header);
-            Log.d("id", String.valueOf(id));
 
             TextView p6Header = new TextView(this);
             p6Header.setId(id++);
@@ -164,12 +179,11 @@ public class TimeTableActivity extends AppCompatActivity {
             p6Header.setGravity(Gravity.CENTER);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 p6Header.setBackground(ResourcesCompat.getDrawable(getResources(),
-                        R.drawable.border6, null));
+                        R.drawable.border1, null));
                 p6Header.setTextColor(Color.WHITE);
             }
             p6Header.setPadding(16, 16, 16, 16);
             trHead.addView(p6Header);
-            Log.d("id", String.valueOf(id));
 
             TextView p7Header = new TextView(this);
             p7Header.setId(id++);
@@ -177,12 +191,11 @@ public class TimeTableActivity extends AppCompatActivity {
             p7Header.setGravity(Gravity.CENTER);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 p7Header.setBackground(ResourcesCompat.getDrawable(getResources(),
-                        R.drawable.border6, null));
+                        R.drawable.border1, null));
                 p7Header.setTextColor(Color.WHITE);
             }
             p7Header.setPadding(16, 16, 16, 16);
             trHead.addView(p7Header);
-            Log.d("id", String.valueOf(id));
 
             TextView p8Header = new TextView(this);
             p8Header.setId(id++);
@@ -190,12 +203,11 @@ public class TimeTableActivity extends AppCompatActivity {
             p8Header.setGravity(Gravity.CENTER);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 p8Header.setBackground(ResourcesCompat.getDrawable(getResources(),
-                        R.drawable.border6, null));
+                        R.drawable.border1, null));
                 p8Header.setTextColor(Color.WHITE);
             }
             p8Header.setPadding(16, 16, 16, 16);
             trHead.addView(p8Header);
-            Log.d("id", String.valueOf(id));
 
             tableLayout.addView(trHead, new TableLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT));
@@ -218,7 +230,7 @@ public class TimeTableActivity extends AppCompatActivity {
                 day.setGravity(Gravity.CENTER_HORIZONTAL);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                     day.setBackground(ResourcesCompat.getDrawable(
-                            getResources(), R.drawable.border6, null));
+                            getResources(), R.drawable.border1, null));
                 }
                 day.setTextColor(Color.WHITE);
                 day.setText(DAYS[i]);
@@ -248,11 +260,82 @@ public class TimeTableActivity extends AppCompatActivity {
 
             getTimeTableData();
         }
+
+        //Initializing our broadcast receiver
+        mRegistrationBroadcastReceiver = new BroadcastReceiver() {
+
+            //When the broadcast received
+            //We are sending the broadcast from GCMRegistrationIntentService
+
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                //If the broadcast has received with success
+                //that means device is registered successfully
+                if (intent.getAction().equals(GCMRegistrationService.REGISTRATION_SUCCESS)) {
+                    //Getting the registration token from the intent
+                    String token = intent.getStringExtra("token");
+                    Log.e("HERE", token);
+                    //Displaying the token as toast
+                    //Toast.makeText(getApplicationContext(), "Registration token:" + token, Toast.LENGTH_LONG).show();
+
+                    putGCMToken(token);
+                    //if the intent is not with success then displaying error messages
+                } else if (intent.getAction().equals(GCMRegistrationService.REGISTRATION_ERROR)) {
+                    Log.e("GCM", "GCM Error");
+                } else {
+                    Log.e("GCM", "Other Error");
+                }
+            }
+        };
+
+        //Checking play service is available or not
+        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getApplicationContext());
+
+        //if play service is not available
+        if (ConnectionResult.SUCCESS == resultCode) {
+            //Starting intent to register device
+            Intent itent = new Intent(this, GCMRegistrationService.class);
+            startService(itent);
+        } else {
+            //If play service is supported but not installed
+            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
+                //Displaying message that play service is not installed
+                Toast.makeText(getApplicationContext(), "Google Play Service is not install/enabled in this device!", Toast.LENGTH_LONG).show();
+                GooglePlayServicesUtil.showErrorNotification(resultCode, getApplicationContext());
+
+                //If play service is not supported
+                //Displaying an error message
+            } else {
+                Toast.makeText(getApplicationContext(), "This device does not support for Google Play Service!", Toast.LENGTH_LONG).show();
+            }
+        }
+
+        try {
+            PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            int verCode = pInfo.versionCode;
+            checkForUpdate(verCode);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //Unregistering receiver on activity paused
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.w("MainActivity", "onPause");
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
     }
 
     @Override
     public void onResume() {
         super.onResume();
+
+        Log.w("MainActivity", "onResume");
+        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                new IntentFilter(GCMRegistrationService.REGISTRATION_SUCCESS));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                new IntentFilter(GCMRegistrationService.REGISTRATION_ERROR));
 
         if (timeTableExists) {
             for (int i = 0; i < 8; i++) {
@@ -260,7 +343,7 @@ public class TimeTableActivity extends AppCompatActivity {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                     if (textView != null) {
                         textView.setBackground(ResourcesCompat.getDrawable(
-                                getResources(), R.drawable.border6, null));
+                                getResources(), R.drawable.border1, null));
                     }
                 }
             }
@@ -270,7 +353,7 @@ public class TimeTableActivity extends AppCompatActivity {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                     if (textView != null) {
                         textView.setBackground(ResourcesCompat.getDrawable(
-                                getResources(), R.drawable.border6, null));
+                                getResources(), R.drawable.border1, null));
                     }
                 }
             }
@@ -278,8 +361,6 @@ public class TimeTableActivity extends AppCompatActivity {
             Calendar calendar = Calendar.getInstance();
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm");
             String time = simpleDateFormat.format(calendar.getTime());
-
-            Log.d("TAG", time);
 
             int temp1 = 0;
 
@@ -357,7 +438,7 @@ public class TimeTableActivity extends AppCompatActivity {
                         Log.d("response", response);
 
                         timeTable = openOrCreateDatabase("timetable",
-                                Context.MODE_PRIVATE, null);
+                                MODE_PRIVATE, null);
                         timeTable.execSQL("CREATE TABLE IF NOT EXISTS TimeTable(" +
                                 "STREAM VARCHAR(10),DAY INT,P1 VARCHAR(50)," +
                                 "P2 VARCHAR(50),P3 VARCHAR(50),P4 VARCHAR(50)," +
@@ -378,7 +459,7 @@ public class TimeTableActivity extends AppCompatActivity {
                                         object.getString("p7") + "','" + object.getString("p8") + "');");
                             }
                             SharedPreferences.Editor editor = getSharedPreferences(
-                                    "SignIn", Context.MODE_PRIVATE).edit();
+                                    "SignIn", MODE_PRIVATE).edit();
                             editor.putLong("updated", System.currentTimeMillis());
                             editor.apply();
                             updated.setText("Last Synced: Today");
@@ -398,6 +479,115 @@ public class TimeTableActivity extends AppCompatActivity {
 
                         Toast.makeText(TimeTableActivity.this, "Connection Problem! :(",
                                 Toast.LENGTH_LONG).show();
+                    }
+                }) {
+        };
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(stringRequest);
+    }
+
+    protected void putGCMToken(final String token) {
+        String url = API_URL + "putGCMToken.php";
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d("response", response);
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("response", "error");
+                    }
+                }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                params.put("token", token);
+                return params;
+            }
+        };
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(stringRequest);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (doubleBackToExitPressedOnce) {
+            super.onBackPressed();
+            return;
+        }
+
+        doubleBackToExitPressedOnce = true;
+        Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
+
+        new Handler().postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                doubleBackToExitPressedOnce = false;
+            }
+        }, 2000);
+    }
+
+    void checkForUpdate(final int vCode) {
+        String url = API_URL + "checkForUpdate.php";
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d("response", response);
+
+//                        String name;
+
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            JSONArray jsonArray = jsonObject.getJSONArray("result");
+                            JSONObject jsonObject1 = jsonArray.getJSONObject(0);
+                            int code = jsonObject1.getInt("vCode");
+//                            name = c.getString("vName");
+                            String desc = jsonObject1.getString("desc");
+                            link = jsonObject1.getString("link");
+                            if (code > vCode) {
+                                SweetAlertDialog sweetAlertDialog = new SweetAlertDialog(
+                                        TimeTableActivity.this, WARNING_TYPE);
+                                sweetAlertDialog.setTitleText("App Update Available!");
+                                sweetAlertDialog.setContentText(desc);
+                                sweetAlertDialog.setConfirmText("Download");
+                                sweetAlertDialog.setCancelText("Cancel");
+                                sweetAlertDialog.setCancelable(true);
+                                sweetAlertDialog.setCanceledOnTouchOutside(false);
+                                sweetAlertDialog.setCancelClickListener(new OnSweetClickListener() {
+                                    @Override
+                                    public void onClick(SweetAlertDialog sweetAlertDialog) {
+                                        sweetAlertDialog.dismissWithAnimation();
+                                    }
+                                });
+                                sweetAlertDialog.setConfirmClickListener(new OnSweetClickListener() {
+                                    @Override
+                                    public void onClick(SweetAlertDialog sweetAlertDialog) {
+                                        Intent browserIntent = new Intent(Intent.ACTION_VIEW,
+                                                Uri.parse(link));
+                                        startActivity(browserIntent);
+                                    }
+                                });
+                                sweetAlertDialog.show();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d("response", "error");
                     }
                 }) {
         };
