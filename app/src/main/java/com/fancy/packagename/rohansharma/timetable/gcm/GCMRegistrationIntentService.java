@@ -11,23 +11,16 @@ import com.google.android.gms.iid.InstanceID;
 
 import java.io.IOException;
 
-/**
- * Created by RohansyN on 27-07-2016.
- */
-public class GCMRegistrationService extends IntentService {
-
+public class GCMRegistrationIntentService extends IntentService {
     public static final String REGISTRATION_SUCCESS = "RegistrationSuccess";
     public static final String REGISTRATION_ERROR = "RegistrationError";
 
-    //Class constructor
-    public GCMRegistrationService() {
+    public GCMRegistrationIntentService() {
         super("");
     }
 
-
     @Override
     protected void onHandleIntent(Intent intent) {
-        //Registering gcm to the device
         registerGCM();
     }
 

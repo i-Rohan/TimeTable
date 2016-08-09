@@ -4,18 +4,12 @@
     package="com.fancy.packagename.rohansharma.timetable">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <!--<uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />-->
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <!--<uses-permission android:name="android.permission.WAKE_LOCK" />-->
-    <!--<uses-permission android:name="android.permission.VIBRATE" />-->
-    <!--<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />-->
-    <!--<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />-->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
-    <!--<permission-->
-        <!--android:name="com.fancy.packagename.rohansharma.timetable.permission.C2D_MESSAGE"-->
-        <!--android:protectionLevel="signature" />-->
-
-    <!--<uses-permission android:name="com.fancy.packagename.rohansharma.timetable.permission.C2D_MESSAGE" />-->
+    <permission
+        android:name="com.fancy.packagename.rohansharma.timetable.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+    <uses-permission android:name="com.fancy.packagename.rohansharma.timetable.permission.C2D_MESSAGE" />
 
     <application
         android:allowBackup="false"
@@ -32,30 +26,27 @@
             </intent-filter>
         </activity>
         <activity android:name=".activity.TimeTableActivity" />
-        <!-- GCM Receiver -->
+
         <receiver
             android:name="com.google.android.gms.gcm.GcmReceiver"
             android:exported="true"
             android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-
-                <category android:name="com.fancy.packagename.rohansharma.timetable" />
+                <category android:name="com.gnirt69.gcmexample" />
             </intent-filter>
         </receiver>
 
-        <!-- GCM Receiver Service -->
         <service
-            android:name=".gcm.GCMPushReciever"
+            android:name=".gcm.GCMPushReceiverService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
             </intent-filter>
         </service>
 
-        <!-- GCM Registration Intent Service -->
         <service
-            android:name="gcm.GCMRegistrationService"
+            android:name=".gcm.GCMRegistrationIntentService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.android.gms.iid.InstanceID" />

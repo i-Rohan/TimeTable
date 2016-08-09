@@ -34,7 +34,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.fancy.packagename.rohansharma.timetable.R;
-import com.fancy.packagename.rohansharma.timetable.gcm.GCMRegistrationService;
+import com.fancy.packagename.rohansharma.timetable.gcm.GCMRegistrationIntentService;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
@@ -62,6 +62,7 @@ import static com.fancy.packagename.rohansharma.timetable.commons.AppCommons.str
 
 public class TimeTableActivity extends AppCompatActivity {
     public static String link;
+    public BroadcastReceiver mRegistrationBroadcastReceiver;
     int id = 1;
     TableLayout tableLayout;
     SQLiteDatabase timeTable;
@@ -69,7 +70,6 @@ public class TimeTableActivity extends AppCompatActivity {
     TextView updated;
     boolean timeTableExists;
     boolean doubleBackToExitPressedOnce;
-    private BroadcastReceiver mRegistrationBroadcastReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -261,7 +261,14 @@ public class TimeTableActivity extends AppCompatActivity {
             getTimeTableData();
         }
 
-        //Initializing our broadcast receiver
+        try {
+            PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            int verCode = pInfo.versionCode;
+            checkForUpdate(verCode);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
         mRegistrationBroadcastReceiver = new BroadcastReceiver() {
 
             //When the broadcast received
@@ -271,19 +278,22 @@ public class TimeTableActivity extends AppCompatActivity {
             public void onReceive(Context context, Intent intent) {
                 //If the broadcast has received with success
                 //that means device is registered successfully
-                if (intent.getAction().equals(GCMRegistrationService.REGISTRATION_SUCCESS)) {
+                if (intent.getAction().equals(GCMRegistrationIntentService.REGISTRATION_SUCCESS)) {
                     //Getting the registration token from the intent
                     String token = intent.getStringExtra("token");
-                    Log.e("HERE", token);
                     //Displaying the token as toast
-                    //Toast.makeText(getApplicationContext(), "Registration token:" + token, Toast.LENGTH_LONG).show();
+//                    Toast.makeText(getApplicationContext(), "Registration token:" + token, Toast.LENGTH_LONG).show();
+                    Log.d("gcm", token);
 
                     putGCMToken(token);
+
                     //if the intent is not with success then displaying error messages
-                } else if (intent.getAction().equals(GCMRegistrationService.REGISTRATION_ERROR)) {
-                    Log.e("GCM", "GCM Error");
+                } else if (intent.getAction().equals(GCMRegistrationIntentService.REGISTRATION_ERROR)) {
+//                    Toast.makeText(getApplicationContext(), "GCM registration error!", Toast.LENGTH_LONG).show();
+                    Log.d("gcm", "gcm error");
                 } else {
-                    Log.e("GCM", "Other Error");
+//                    Toast.makeText(getApplicationContext(), "Error occurred", Toast.LENGTH_LONG).show();
+                    Log.d("gcm", "other error");
                 }
             }
         };
@@ -293,9 +303,7 @@ public class TimeTableActivity extends AppCompatActivity {
 
         //if play service is not available
         if (ConnectionResult.SUCCESS == resultCode) {
-            //Starting intent to register device
-            Intent itent = new Intent(this, GCMRegistrationService.class);
-            startService(itent);
+            startService(new Intent(this, GCMRegistrationIntentService.class));
         } else {
             //If play service is supported but not installed
             if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
@@ -308,18 +316,11 @@ public class TimeTableActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(getApplicationContext(), "This device does not support for Google Play Service!", Toast.LENGTH_LONG).show();
             }
-        }
 
-        try {
-            PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-            int verCode = pInfo.versionCode;
-            checkForUpdate(verCode);
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
+            //If play service is available
         }
     }
 
-    //Unregistering receiver on activity paused
     @Override
     protected void onPause() {
         super.onPause();
@@ -333,9 +334,9 @@ public class TimeTableActivity extends AppCompatActivity {
 
         Log.w("MainActivity", "onResume");
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
-                new IntentFilter(GCMRegistrationService.REGISTRATION_SUCCESS));
+                new IntentFilter(GCMRegistrationIntentService.REGISTRATION_SUCCESS));
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
-                new IntentFilter(GCMRegistrationService.REGISTRATION_ERROR));
+                new IntentFilter(GCMRegistrationIntentService.REGISTRATION_ERROR));
 
         if (timeTableExists) {
             for (int i = 0; i < 8; i++) {
@@ -435,7 +436,7 @@ public class TimeTableActivity extends AppCompatActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Log.d("response", response);
+                        Log.d("timetable", response);
 
                         timeTable = openOrCreateDatabase("timetable",
                                 MODE_PRIVATE, null);
@@ -475,10 +476,10 @@ public class TimeTableActivity extends AppCompatActivity {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.d("response", "error");
+                        Log.d("timetable", "error");
 
-                        Toast.makeText(TimeTableActivity.this, "Connection Problem! :(",
-                                Toast.LENGTH_LONG).show();
+                        /*Toast.makeText(TimeTableActivity.this, "Connection Problem! :(",
+                                Toast.LENGTH_LONG).show();*/
                     }
                 }) {
         };
@@ -494,14 +495,14 @@ public class TimeTableActivity extends AppCompatActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Log.d("response", response);
+                        Log.d("putGcm", ' ' + response);
 
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.e("response", "error");
+                        Log.e("putGcm", "error");
                     }
                 }) {
             @Override
@@ -542,7 +543,7 @@ public class TimeTableActivity extends AppCompatActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Log.d("response", response);
+                        Log.d("update", response);
 
 //                        String name;
 
@@ -587,7 +588,7 @@ public class TimeTableActivity extends AppCompatActivity {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.d("response", "error");
+                        Log.d("update", "error");
                     }
                 }) {
         };
