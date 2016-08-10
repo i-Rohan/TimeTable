@@ -36,14 +36,15 @@ public class GCMPushReceiverService extends GcmListenerService {
                                   String subject) {
         SQLiteDatabase sqLiteDatabase = openOrCreateDatabase("notifications", MODE_PRIVATE, null);
         sqLiteDatabase.execSQL("CREATE TABLE IF NOT EXISTS Notifications(" +
-                "N_ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
+                "N_ID LONG," +
                 "TITLE VARCHAR(100)," +
                 "STREAM VARCHAR(10)," +
                 "DATE VARCHAR(50)," +
                 "TIME VARCHAR(50)," +
                 "SUBJECT VARCHAR(100));");
 
-        sqLiteDatabase.execSQL("INSERT INTO Notifications VALUES('null'," +
+        sqLiteDatabase.execSQL("INSERT INTO Notifications VALUES(" +
+                System.currentTimeMillis() + ',' +
                 '\'' + title + "'," +
                 '\'' + stream + "'," +
                 '\'' + date + "'," +

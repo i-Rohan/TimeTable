@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:scrollbars="vertical">
+    android:layout_height="wrap_content">
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
@@ -12,10 +10,10 @@
         <HorizontalScrollView xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/sv"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/stream"
+            android:layout_height="match_parent"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true">
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/stream">
 
 
             <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -49,21 +47,26 @@
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
         <TextView
+            android:id="@+id/stream"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:id="@+id/stream"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            android:textColor="@color/colorPrimaryDark"
-            android:layout_marginTop="16dp" />
+            android:layout_marginTop="16dp"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/colorPrimaryDark" />
 
         <ListView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:id="@+id/listView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_below="@+id/updated"
-            android:layout_centerHorizontal="true" />
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="25dp"
+            android:layout_marginLeft="25dp"
+            android:layout_marginRight="25dp"
+            android:background="@drawable/border2"
+            android:padding="16dp" />
 
     </RelativeLayout>
 </ScrollView>
