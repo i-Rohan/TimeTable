@@ -24,6 +24,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -48,6 +50,8 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.AbstractList;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -76,6 +80,7 @@ public class TimeTableActivity extends AppCompatActivity {
     boolean timeTableExists;
     boolean doubleBackToExitPressedOnce;
     TextView stream;
+    ListView listView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +95,7 @@ public class TimeTableActivity extends AppCompatActivity {
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         updated = (TextView) findViewById(R.id.updated);
         stream = (TextView) findViewById(R.id.stream);
+        listView = (ListView) findViewById(R.id.listView);
 
         if (stream != null) {
             stream.setText(STREAMS[AppCommons.stream]);
@@ -265,6 +271,7 @@ public class TimeTableActivity extends AppCompatActivity {
                     tr.addView(period);
                 }
                 cursor.close();
+                sqLiteDatabase.close();
                 tableLayout.addView(tr, new TableLayout.LayoutParams(ViewGroup.LayoutParams
                         .MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
             }
@@ -275,6 +282,34 @@ public class TimeTableActivity extends AppCompatActivity {
 
             getTimeTableData();
         }
+
+        file = new File("/data/data/" + getPackageName() + "/databases/notifications");
+        if (file.exists()) {
+            SQLiteDatabase sqLiteDatabase = SQLiteDatabase.openDatabase("/data/data/" +
+                            getPackageName() + "/databases/notifications", null,
+                    SQLiteDatabase.OPEN_READONLY);
+            Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM Notifications ORDER BY N_ID DESC " +
+                    "LIMIT 7", null);
+            cursor.moveToFirst();
+            String temp = cursor.getString(1) + " of " + cursor.getString(2) + " on " +
+                    cursor.getString(3) + " at " + cursor.getString(4) + " of subject " +
+                    cursor.getString(5);
+            AbstractList<String> list = new ArrayList<>();
+            list.add(temp);
+            while (cursor.moveToNext()) {
+                temp = cursor.getString(1) + " of " + cursor.getString(2) + " on " +
+                        cursor.getString(3) + " at " + cursor.getString(4) + " of subject " +
+                        cursor.getString(5);
+                list.add(temp);
+            }
+            cursor.close();
+            sqLiteDatabase.close();
+            String values[] = list.toArray(new String[list.size()]);
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+                    android.R.layout.simple_list_item_1, android.R.id.text1, values);
+            listView.setAdapter(adapter);
+        }
+
 
         try {
             PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
@@ -648,6 +683,12 @@ public class TimeTableActivity extends AppCompatActivity {
                     Toast.makeText(this, "There are no email clients installed.",
                             Toast.LENGTH_SHORT).show();
                 }
+                return true;
+            case R.id.action_share:
+                intent = new Intent(Intent.ACTION_SEND);
+                intent.setType("text/plain");
+                intent.putExtra(Intent.EXTRA_TEXT, "https://github.com/i-Rohan/TimeTable/releases/download/v0.5-alpha/BMU_Time_Table_v0.5-alpha.apk");
+                startActivity(Intent.createChooser(intent, "Share Via..."));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

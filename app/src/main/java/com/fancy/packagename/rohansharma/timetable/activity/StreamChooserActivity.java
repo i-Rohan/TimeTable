@@ -58,7 +58,7 @@ public class StreamChooserActivity extends AppCompatActivity {
         editor.putBoolean(SIGNED_IN, true);
         editor.putInt(STREAM, spinner.getSelectedItemPosition());
         editor.apply();
-
+        stream = spinner.getSelectedItemPosition();
         startActivity(new Intent(this, TimeTableActivity.class));
         finish();
     }

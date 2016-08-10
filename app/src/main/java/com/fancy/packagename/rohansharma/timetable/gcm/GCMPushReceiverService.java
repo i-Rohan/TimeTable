@@ -1,6 +1,7 @@
 package com.fancy.packagename.rohansharma.timetable.gcm;
 
 import android.app.Notification;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 
 import com.fancy.packagename.rohansharma.timetable.R;
@@ -21,19 +22,38 @@ public class GCMPushReceiverService extends GcmListenerService {
         try {
             JSONObject jsonObject = new JSONObject(message);
             String title = jsonObject.getString("title");
-            String msg = jsonObject.getString("stream") + '\n' + jsonObject.getString("date") +
-                    '\n' + jsonObject.getString("time") + '\n' + jsonObject.getString("subject");
-            sendNotification(title, msg);
+            String stream = jsonObject.getString("stream");
+            String date = jsonObject.getString("date");
+            String time = jsonObject.getString("time");
+            String subject = jsonObject.getString("subject");
+            sendNotification(title, stream, date, time, subject);
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
-    private void sendNotification(String title, String message) {
+    private void sendNotification(String title, String stream, String date, String time,
+                                  String subject) {
+        SQLiteDatabase sqLiteDatabase = openOrCreateDatabase("notifications", MODE_PRIVATE, null);
+        sqLiteDatabase.execSQL("CREATE TABLE IF NOT EXISTS Notifications(" +
+                "N_ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
+                "TITLE VARCHAR(100)," +
+                "STREAM VARCHAR(10)," +
+                "DATE VARCHAR(50)," +
+                "TIME VARCHAR(50)," +
+                "SUBJECT VARCHAR(100));");
+
+        sqLiteDatabase.execSQL("INSERT INTO Notifications VALUES('null'," +
+                '\'' + title + "'," +
+                '\'' + stream + "'," +
+                '\'' + date + "'," +
+                '\'' + time + "'," +
+                '\'' + subject + "');");
+
         PugNotification.with(getApplicationContext())
                 .load()
                 .title(title)
-                .bigTextStyle(message, "BMU Time Table")
+                .bigTextStyle(stream + '\n' + date + '\n' + time + '\n' + subject, "BMU Time Table")
                 .smallIcon(R.drawable.notification_icon)
                 .largeIcon(R.mipmap.ic_launcher)
                 .flags(Notification.DEFAULT_ALL)

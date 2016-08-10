@@ -57,5 +57,13 @@
             android:layout_centerHorizontal="true"
             android:textColor="@color/colorPrimaryDark"
             android:layout_marginTop="16dp" />
+
+        <ListView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/listView"
+            android:layout_below="@+id/updated"
+            android:layout_centerHorizontal="true" />
+
     </RelativeLayout>
 </ScrollView>
