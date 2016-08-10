@@ -1,5 +1,6 @@
 package com.fancy.packagename.rohansharma.timetable.activity;
 
+import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -19,6 +20,8 @@ import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
@@ -34,6 +37,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.fancy.packagename.rohansharma.timetable.R;
+import com.fancy.packagename.rohansharma.timetable.commons.AppCommons;
 import com.fancy.packagename.rohansharma.timetable.gcm.GCMRegistrationIntentService;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -56,9 +60,10 @@ import static com.fancy.packagename.rohansharma.timetable.commons.AppCommons.API
 import static com.fancy.packagename.rohansharma.timetable.commons.AppCommons.DAYS;
 import static com.fancy.packagename.rohansharma.timetable.commons.AppCommons.DAY_IDS;
 import static com.fancy.packagename.rohansharma.timetable.commons.AppCommons.PERIOD_IDS;
+import static com.fancy.packagename.rohansharma.timetable.commons.AppCommons.SIGNED_IN;
 import static com.fancy.packagename.rohansharma.timetable.commons.AppCommons.SIGN_IN;
+import static com.fancy.packagename.rohansharma.timetable.commons.AppCommons.STREAM;
 import static com.fancy.packagename.rohansharma.timetable.commons.AppCommons.STREAMS;
-import static com.fancy.packagename.rohansharma.timetable.commons.AppCommons.stream;
 
 public class TimeTableActivity extends AppCompatActivity {
     public static String link;
@@ -70,15 +75,25 @@ public class TimeTableActivity extends AppCompatActivity {
     TextView updated;
     boolean timeTableExists;
     boolean doubleBackToExitPressedOnce;
+    TextView stream;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_time_table);
 
+        overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
+
+        setTitle("Time Table");
+
         tableLayout = (TableLayout) findViewById(R.id.main_table);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         updated = (TextView) findViewById(R.id.updated);
+        stream = (TextView) findViewById(R.id.stream);
+
+        if (stream != null) {
+            stream.setText(STREAMS[AppCommons.stream]);
+        }
 
         File file = new File("/data/data/" + '/' + getPackageName() + "/databases/" + "timetable");
         if (file.exists()) {
@@ -86,7 +101,7 @@ public class TimeTableActivity extends AppCompatActivity {
             progressBar.setVisibility(View.GONE);
             SharedPreferences sharedPreferences = getSharedPreferences(SIGN_IN,
                     MODE_PRIVATE);
-            stream = sharedPreferences.getInt("stream", 0);
+            AppCommons.stream = sharedPreferences.getInt("stream", 0);
             long temp = (System.currentTimeMillis() - sharedPreferences.getLong("updated", 0))
                     / (1000 * 3600 * 24);
             if (temp == 0)
@@ -217,7 +232,7 @@ public class TimeTableActivity extends AppCompatActivity {
                                 getPackageName() + "/databases/timetable", null,
                         SQLiteDatabase.OPEN_READONLY);
                 Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM TimeTable WHERE STREAM='" +
-                        STREAMS[stream] + "' AND DAY=" + i, null);
+                        STREAMS[AppCommons.stream] + "' AND DAY=" + i, null);
                 cursor.moveToFirst();
 
                 TableRow tr = new TableRow(this);
@@ -595,5 +610,47 @@ public class TimeTableActivity extends AppCompatActivity {
 
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         requestQueue.add(stringRequest);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_time_table, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_change_stream:
+                SharedPreferences.Editor editor = getSharedPreferences(SIGN_IN, MODE_PRIVATE).edit();
+                editor.remove(SIGNED_IN);
+                editor.remove(STREAM);
+                editor.apply();
+                startActivity(new Intent(this, StreamChooserActivity.class));
+                finish();
+                return true;
+            case R.id.action_feedback:
+                Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.setType("message/rfc822");
+                intent.putExtra(Intent.EXTRA_EMAIL, new String[]{"irohansharma95@gmail.com"});
+                try {
+                    intent.putExtra(Intent.EXTRA_SUBJECT, getString(getApplicationInfo().labelRes) +
+                            ' ' + getPackageManager().getPackageInfo(getPackageName(), 0)
+                            .versionName + " Feedback");
+                } catch (PackageManager.NameNotFoundException e) {
+                    e.printStackTrace();
+                }
+                intent.putExtra(Intent.EXTRA_TEXT, "Model: " + Build.MODEL + '\n' + "Android API: "
+                        + Build.VERSION.SDK_INT + "\n\n");
+                try {
+                    startActivity(Intent.createChooser(intent, "Send mail..."));
+                } catch (ActivityNotFoundException ignored) {
+                    Toast.makeText(this, "There are no email clients installed.",
+                            Toast.LENGTH_SHORT).show();
+                }
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }

@@ -1,0 +1,16 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainActivity">
+
+    <!--Change Stream-->
+    <item
+        android:id="@+id/action_change_stream"
+        android:icon="@drawable/ic_swap_calls_black_24dp"
+        android:title="Change Stream" />
+
+    <!--Feedback-->
+    <item
+        android:id="@+id/action_feedback"
+        android:icon="@drawable/ic_feedback_black_24dp"
+        android:title="Feedback" />
+</menu>

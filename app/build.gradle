@@ -2,14 +2,14 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "24.0.0"
+    buildToolsVersion "24.0.1"
 
     defaultConfig {
         applicationId "com.fancy.packagename.rohansharma.timetable"
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 3
-        versionName "0.3"
+        versionCode 4
+        versionName "v0.4-alpha"
     }
     buildTypes {
         release {

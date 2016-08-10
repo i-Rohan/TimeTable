@@ -1,17 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
 
-    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/sv"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:scrollbars="vertical">
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scrollbars="vertical">
+        android:layout_height="wrap_content">
 
         <HorizontalScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/sv"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/stream"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true">
 
 
             <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -23,25 +27,35 @@
 
 
         </HorizontalScrollView>
-    </ScrollView>
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/sv"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:indeterminate="false"
-        android:padding="50dp" />
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/sv"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:indeterminate="false"
+            android:padding="50dp" />
 
-    <TextView
-        android:id="@+id/updated"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/sv"
-        android:layout_centerHorizontal="true"
-        android:padding="16dp"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
-</RelativeLayout>
+        <TextView
+            android:id="@+id/updated"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/sv"
+            android:layout_centerHorizontal="true"
+            android:padding="16dp"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:id="@+id/stream"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/colorPrimaryDark"
+            android:layout_marginTop="16dp" />
+    </RelativeLayout>
+</ScrollView>

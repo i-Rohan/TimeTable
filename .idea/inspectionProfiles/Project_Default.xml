@@ -734,10 +734,6 @@
     <inspection_tool class="SuspiciousArrayCast" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="SuspiciousIndentAfterControlStatement" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="SuspiciousLiteralUnderscore" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="SwitchStatement" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="SwitchStatementDensity" enabled="true" level="WARNING" enabled_by_default="true">
-      <option name="m_limit" value="20" />
-    </inspection_tool>
     <inspection_tool class="SwitchStatementWithConfusingDeclaration" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="SwitchStatementWithTooFewBranches" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="m_limit" value="2" />
