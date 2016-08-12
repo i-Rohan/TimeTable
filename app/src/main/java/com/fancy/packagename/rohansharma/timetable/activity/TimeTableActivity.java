@@ -308,6 +308,9 @@ public class TimeTableActivity extends AppCompatActivity {
             ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
                     android.R.layout.simple_list_item_1, android.R.id.text1, values);
             listView.setAdapter(adapter);
+
+            if (list.isEmpty())
+                listView.setVisibility(View.GONE);
         }
 
 
@@ -486,7 +489,7 @@ public class TimeTableActivity extends AppCompatActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Log.d("timetable", response);
+                        Log.d("timetable", ' ' + response);
 
                         timeTable = openOrCreateDatabase("timetable",
                                 MODE_PRIVATE, null);
@@ -495,11 +498,11 @@ public class TimeTableActivity extends AppCompatActivity {
                                 "P2 VARCHAR(50),P3 VARCHAR(50),P4 VARCHAR(50)," +
                                 "P5 VARCHAR(50),P6 VARCHAR(50),P7 VARCHAR(50)," +
                                 "P8 VARCHAR(50));");
-                        timeTable.execSQL("DELETE FROM TimeTable");
                         try {
                             JSONObject jsonObject = new JSONObject(response);
                             JSONArray jsonArray = jsonObject.getJSONArray("result");
                             int length = jsonArray.length();
+                            timeTable.execSQL("DELETE FROM TimeTable");
                             for (int i = 0; i < length; i++) {
                                 JSONObject object = jsonArray.getJSONObject(i);
                                 timeTable.execSQL("INSERT INTO TimeTable VALUES('" +
@@ -528,8 +531,10 @@ public class TimeTableActivity extends AppCompatActivity {
                     public void onErrorResponse(VolleyError error) {
                         Log.d("timetable", "error");
 
-                        /*Toast.makeText(TimeTableActivity.this, "Connection Problem! :(",
-                                Toast.LENGTH_LONG).show();*/
+                        if (!timeTableExists) {
+                            Toast.makeText(TimeTableActivity.this, "Connection Problem! :(",
+                                    Toast.LENGTH_LONG).show();
+                        }
                     }
                 }) {
         };
@@ -687,7 +692,7 @@ public class TimeTableActivity extends AppCompatActivity {
             case R.id.action_share:
                 intent = new Intent(Intent.ACTION_SEND);
                 intent.setType("text/plain");
-                intent.putExtra(Intent.EXTRA_TEXT, "https://github.com/i-Rohan/TimeTable/releases/download/v0.5-alpha/BMU_Time_Table_v0.5-alpha.apk");
+                intent.putExtra(Intent.EXTRA_TEXT, "https://github.com/i-Rohan/TimeTable/releases/download/v0.51-alpha/BMU_Time_Table_v0.51-alpha.apk");
                 startActivity(Intent.createChooser(intent, "Share Via..."));
                 return true;
             default:
