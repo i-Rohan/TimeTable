@@ -306,12 +306,9 @@ public class TimeTableActivity extends AppCompatActivity {
             sqLiteDatabase.close();
             String values[] = list.toArray(new String[list.size()]);
             ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                    android.R.layout.simple_list_item_1, android.R.id.text1, values);
+                    android.R.layout.simple_list_item_2, android.R.id.text2, values);
             listView.setAdapter(adapter);
-
-            if (list.isEmpty())
-                listView.setVisibility(View.GONE);
-        }
+        } else listView.setVisibility(View.GONE);
 
 
         try {
@@ -516,7 +513,7 @@ public class TimeTableActivity extends AppCompatActivity {
                                     "SignIn", MODE_PRIVATE).edit();
                             editor.putLong("updated", System.currentTimeMillis());
                             editor.apply();
-                            updated.setText("Last Synced: Today");
+                            updated.setText("Last synced: Today");
                             if (!timeTableExists) {
                                 startActivity(getIntent());
                                 finish();
