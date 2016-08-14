@@ -13,9 +13,11 @@ import android.widget.Toast;
 
 import com.fancy.packagename.rohansharma.timetable.R;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import static com.fancy.packagename.rohansharma.timetable.commons.AppCommons.FIRST_LAUNCH;
 import static com.fancy.packagename.rohansharma.timetable.commons.AppCommons.SIGNED_IN;
 import static com.fancy.packagename.rohansharma.timetable.commons.AppCommons.SIGN_IN;
 import static com.fancy.packagename.rohansharma.timetable.commons.AppCommons.STREAM;

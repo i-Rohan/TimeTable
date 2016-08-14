@@ -8,8 +8,8 @@ android {
         applicationId "com.fancy.packagename.rohansharma.timetable"
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 6
-        versionName "v0.51-alpha"
+        versionCode 7
+        versionName "v0.52-alpha"
     }
     buildTypes {
         release {

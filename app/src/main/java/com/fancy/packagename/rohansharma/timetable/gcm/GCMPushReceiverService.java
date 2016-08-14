@@ -3,6 +3,7 @@ package com.fancy.packagename.rohansharma.timetable.gcm;
 import android.app.Notification;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.fancy.packagename.rohansharma.timetable.R;
 import com.fancy.packagename.rohansharma.timetable.activity.TimeTableActivity;
@@ -26,14 +27,18 @@ public class GCMPushReceiverService extends GcmListenerService {
             String date = jsonObject.getString("date");
             String time = jsonObject.getString("time");
             String subject = jsonObject.getString("subject");
-            sendNotification(title, stream, date, time, subject);
+            String endDatetime = jsonObject.getString("end_datetime");
+
+            Log.d("END", endDatetime);
+
+            sendNotification(title, stream, date, time, subject, endDatetime);
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
     private void sendNotification(String title, String stream, String date, String time,
-                                  String subject) {
+                                  String subject, String endDatetime) {
         SQLiteDatabase sqLiteDatabase = openOrCreateDatabase("notifications", MODE_PRIVATE, null);
         sqLiteDatabase.execSQL("CREATE TABLE IF NOT EXISTS Notifications(" +
                 "N_ID LONG," +
@@ -41,15 +46,24 @@ public class GCMPushReceiverService extends GcmListenerService {
                 "STREAM VARCHAR(10)," +
                 "DATE VARCHAR(50)," +
                 "TIME VARCHAR(50)," +
-                "SUBJECT VARCHAR(100));");
+                "SUBJECT VARCHAR(100)," +
+                "END_DATETIME VARCHAR(50));");
 
-        sqLiteDatabase.execSQL("INSERT INTO Notifications VALUES(" +
+        sqLiteDatabase.execSQL("INSERT INTO Notifications " +
+                "(N_ID,TITLE," +
+                "STREAM," +
+                "DATE," +
+                "TIME," +
+                "SUBJECT," +
+                "END_DATETIME) " +
+                "VALUES(" +
                 System.currentTimeMillis() + ',' +
                 '\'' + title + "'," +
                 '\'' + stream + "'," +
                 '\'' + date + "'," +
                 '\'' + time + "'," +
-                '\'' + subject + "');");
+                '\'' + subject + "'," +
+                '\'' + endDatetime + "');");
 
         PugNotification.with(getApplicationContext())
                 .load()

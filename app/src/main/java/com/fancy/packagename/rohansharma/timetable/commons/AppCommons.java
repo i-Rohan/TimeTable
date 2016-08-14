@@ -12,5 +12,6 @@ public class AppCommons {
     public static final String DAYS[] = {"Mon", "Tue", "Wed", "Thu", "Fri"};
     public static final int PERIOD_IDS[] = {3, 4, 5, 6, 7, 8, 9, 10};
     public static final int DAY_IDS[] = {12, 22, 32, 42, 52};
+    public static final String FIRST_LAUNCH = "first_launch";
     public static int stream;
 }

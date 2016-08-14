@@ -53,6 +53,7 @@ import java.text.SimpleDateFormat;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -63,6 +64,7 @@ import static cn.pedant.SweetAlert.SweetAlertDialog.WARNING_TYPE;
 import static com.fancy.packagename.rohansharma.timetable.commons.AppCommons.API_URL;
 import static com.fancy.packagename.rohansharma.timetable.commons.AppCommons.DAYS;
 import static com.fancy.packagename.rohansharma.timetable.commons.AppCommons.DAY_IDS;
+import static com.fancy.packagename.rohansharma.timetable.commons.AppCommons.FIRST_LAUNCH;
 import static com.fancy.packagename.rohansharma.timetable.commons.AppCommons.PERIOD_IDS;
 import static com.fancy.packagename.rohansharma.timetable.commons.AppCommons.SIGNED_IN;
 import static com.fancy.packagename.rohansharma.timetable.commons.AppCommons.SIGN_IN;
@@ -287,26 +289,35 @@ public class TimeTableActivity extends AppCompatActivity {
         if (file.exists()) {
             SQLiteDatabase sqLiteDatabase = SQLiteDatabase.openDatabase("/data/data/" +
                             getPackageName() + "/databases/notifications", null,
-                    SQLiteDatabase.OPEN_READONLY);
+                    SQLiteDatabase.OPEN_READWRITE);
+
+            Date time = Calendar.getInstance().getTime();
+            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+            String currentDate = sdf.format(time);
+            Log.d("DATETIME", currentDate);
+            sqLiteDatabase.execSQL("DELETE FROM Notifications WHERE END_DATETIME<'" + currentDate + "';");
+
             Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM Notifications ORDER BY N_ID DESC " +
                     "LIMIT 7", null);
-            cursor.moveToFirst();
-            String temp = cursor.getString(1) + " of " + cursor.getString(2) + " on " +
-                    cursor.getString(3) + " at " + cursor.getString(4) + " of subject " +
-                    cursor.getString(5);
             AbstractList<String> list = new ArrayList<>();
-            list.add(temp);
-            while (cursor.moveToNext()) {
-                temp = cursor.getString(1) + " of " + cursor.getString(2) + " on " +
-                        cursor.getString(3) + " at " + cursor.getString(4) + " of subject " +
+            if (cursor.moveToFirst()) {
+                cursor.moveToFirst();
+                String temp = cursor.getString(1) + '\n' + cursor.getString(2) + '\n' +
+                        cursor.getString(3) + '\n' + cursor.getString(4) + '\n' +
                         cursor.getString(5);
                 list.add(temp);
-            }
+                while (cursor.moveToNext()) {
+                    temp = cursor.getString(1) + '\n' + cursor.getString(2) + '\n' +
+                            cursor.getString(3) + '\n' + cursor.getString(4) + '\n' +
+                            cursor.getString(5);
+                    list.add(temp);
+                }
+            } else listView.setVisibility(View.GONE);
             cursor.close();
             sqLiteDatabase.close();
             String values[] = list.toArray(new String[list.size()]);
             ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                    android.R.layout.simple_list_item_2, android.R.id.text2, values);
+                    android.R.layout.simple_list_item_2, android.R.id.text1, values);
             listView.setAdapter(adapter);
         } else listView.setVisibility(View.GONE);
 
@@ -369,6 +380,15 @@ public class TimeTableActivity extends AppCompatActivity {
 
             //If play service is available
         }
+
+        file = new File("/data/data/" + getPackageName() + "/databases/notifications");
+        SharedPreferences sharedPreferences = getSharedPreferences(FIRST_LAUNCH, MODE_PRIVATE);
+        if (file.exists() && sharedPreferences.getBoolean(FIRST_LAUNCH, true))
+            file.delete();
+
+        SharedPreferences.Editor editor = getSharedPreferences(FIRST_LAUNCH, MODE_PRIVATE).edit();
+        editor.putBoolean(FIRST_LAUNCH, false);
+        editor.apply();
     }
 
     @Override
@@ -689,7 +709,7 @@ public class TimeTableActivity extends AppCompatActivity {
             case R.id.action_share:
                 intent = new Intent(Intent.ACTION_SEND);
                 intent.setType("text/plain");
-                intent.putExtra(Intent.EXTRA_TEXT, "https://github.com/i-Rohan/TimeTable/releases/download/v0.51-alpha/BMU_Time_Table_v0.51-alpha.apk");
+                intent.putExtra(Intent.EXTRA_TEXT, "https://github.com/i-Rohan/TimeTable/releases/download/v0.52-alpha/BMU_Time_Table_v0.52-alpha.apk");
                 startActivity(Intent.createChooser(intent, "Share Via..."));
                 return true;
             default:
