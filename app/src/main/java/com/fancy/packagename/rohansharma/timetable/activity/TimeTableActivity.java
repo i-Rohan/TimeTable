@@ -300,6 +300,15 @@ public class TimeTableActivity extends AppCompatActivity {
         }
 
         file = new File("/data/data/" + getPackageName() + "/databases/notifications");
+        SharedPreferences sharedPreferences = getSharedPreferences(FIRST_LAUNCH, MODE_PRIVATE);
+        if (file.exists() && sharedPreferences.getBoolean(FIRST_LAUNCH, true))
+            file.delete();
+
+        SharedPreferences.Editor editor = getSharedPreferences(FIRST_LAUNCH, MODE_PRIVATE).edit();
+        editor.putBoolean(FIRST_LAUNCH, false);
+        editor.apply();
+
+        file = new File("/data/data/" + getPackageName() + "/databases/notifications");
         if (file.exists()) {
             SQLiteDatabase sqLiteDatabase = SQLiteDatabase.openDatabase("/data/data/" +
                             getPackageName() + "/databases/notifications", null,
@@ -394,15 +403,6 @@ public class TimeTableActivity extends AppCompatActivity {
 
             //If play service is available
         }
-
-        file = new File("/data/data/" + getPackageName() + "/databases/notifications");
-        SharedPreferences sharedPreferences = getSharedPreferences(FIRST_LAUNCH, MODE_PRIVATE);
-        if (file.exists() && sharedPreferences.getBoolean(FIRST_LAUNCH, true))
-            file.delete();
-
-        SharedPreferences.Editor editor = getSharedPreferences(FIRST_LAUNCH, MODE_PRIVATE).edit();
-        editor.putBoolean(FIRST_LAUNCH, false);
-        editor.apply();
 
         new Handler().postDelayed(new Runnable() {
             @Override
