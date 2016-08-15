@@ -10,10 +10,13 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.content.res.ResourcesCompat;
@@ -25,6 +28,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.HorizontalScrollView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TableLayout;
@@ -49,6 +53,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.AbstractList;
 import java.util.ArrayList;
@@ -83,6 +90,9 @@ public class TimeTableActivity extends AppCompatActivity {
     boolean doubleBackToExitPressedOnce;
     TextView stream;
     ListView listView;
+    boolean screenshot = true;
+    String fname = "screenshot.jpg";
+    HorizontalScrollView sv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,6 +108,7 @@ public class TimeTableActivity extends AppCompatActivity {
         updated = (TextView) findViewById(R.id.updated);
         stream = (TextView) findViewById(R.id.stream);
         listView = (ListView) findViewById(R.id.listView);
+        sv = (HorizontalScrollView) findViewById(R.id.sv);
 
         if (stream != null) {
             stream.setText(STREAMS[AppCommons.stream]);
@@ -389,6 +400,55 @@ public class TimeTableActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = getSharedPreferences(FIRST_LAUNCH, MODE_PRIVATE).edit();
         editor.putBoolean(FIRST_LAUNCH, false);
         editor.apply();
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                takeScreenshot();
+            }
+        }, 100);
+    }
+
+    public void takeScreenshot() {
+        Bitmap bitmap = loadBitmapFromView(); // Get the bitmap
+        if (screenshot)
+            saveTheBitmap(bitmap);               // Save it to the external storage device.
+    }
+
+    public void saveTheBitmap(Bitmap bmp) {
+        File myDir = new File(Environment.getExternalStorageDirectory() + "/.timetable");
+        if (!myDir.exists())
+            myDir.mkdirs();
+        File file = new File(myDir, fname);
+        Log.i("File name", String.valueOf(file));
+//        if (file.exists())
+//            file.delete();
+        try {
+            FileOutputStream out = new FileOutputStream(file);
+            bmp.compress(Bitmap.CompressFormat.JPEG, 100, out);
+            out.flush();
+            out.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Bitmap loadBitmapFromView() {
+        Bitmap bitmap = null;
+        try {
+            bitmap = Bitmap.createBitmap(sv.getChildAt(0).getWidth(),
+                    sv.getChildAt(0).getHeight(),
+                    Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(bitmap);
+            sv.getChildAt(0).draw(canvas);
+        } catch (RuntimeException ignored) {
+            screenshot = false;
+        }
+        return bitmap;
     }
 
     @Override
@@ -706,11 +766,25 @@ public class TimeTableActivity extends AppCompatActivity {
                             Toast.LENGTH_SHORT).show();
                 }
                 return true;
-            case R.id.action_share:
+            case R.id.action_share_app:
                 intent = new Intent(Intent.ACTION_SEND);
                 intent.setType("text/plain");
                 intent.putExtra(Intent.EXTRA_TEXT, "https://github.com/i-Rohan/TimeTable/releases/download/v0.52-alpha/BMU_Time_Table_v0.52-alpha.apk");
                 startActivity(Intent.createChooser(intent, "Share Via..."));
+                return true;
+            case R.id.actioon_share_timetable:
+                if (screenshot) {
+                    Intent share = new Intent(Intent.ACTION_SEND);
+                    share.setType("image/jpeg");
+                    String imagePath = Environment.getExternalStorageDirectory() + "/.timetable/" +
+                            fname;
+                    Log.d("image path", imagePath);
+                    File imageFileToShare = new File(imagePath);
+                    Uri uri = Uri.fromFile(imageFileToShare);
+                    share.putExtra(Intent.EXTRA_STREAM, uri);
+                    startActivity(Intent.createChooser(share, "Share Via..."));
+                } else
+                    Toast.makeText(this, "Cannot share on this device! :(", Toast.LENGTH_SHORT).show();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

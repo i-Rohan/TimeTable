@@ -21,7 +21,9 @@
                 android:id="@+id/main_table"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="16dp" />
+                android:elevation="5dp"
+                android:padding="16dp"
+                android:translationZ="5dp" />
 
 
         </HorizontalScrollView>
@@ -34,8 +36,10 @@
             android:layout_below="@+id/sv"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
+            android:elevation="5dp"
             android:indeterminate="false"
-            android:padding="50dp" />
+            android:padding="50dp"
+            android:translationZ="5dp" />
 
         <TextView
             android:id="@+id/updated"
@@ -43,8 +47,10 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/sv"
             android:layout_centerHorizontal="true"
+            android:elevation="5dp"
             android:padding="16dp"
             android:textAppearance="?android:attr/textAppearanceSmall"
+            android:translationZ="5dp"
             android:visibility="gone" />
 
         <TextView
@@ -54,8 +60,10 @@
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="16dp"
+            android:elevation="5dp"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textColor="@color/colorPrimaryDark" />
+            android:textColor="@color/colorPrimaryDark"
+            android:translationZ="5dp" />
 
         <ListView
             android:id="@+id/listView"
@@ -67,7 +75,9 @@
             android:layout_marginLeft="25dp"
             android:layout_marginRight="25dp"
             android:background="@drawable/border2"
-            android:padding="16dp" />
+            android:elevation="5dp"
+            android:padding="16dp"
+            android:translationZ="5dp" />
 
     </RelativeLayout>
 </ScrollView>
