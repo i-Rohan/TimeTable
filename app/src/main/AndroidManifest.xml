@@ -11,6 +11,7 @@
     <permission
         android:name="com.fancy.packagename.rohansharma.timetable.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
+
     <uses-permission android:name="com.fancy.packagename.rohansharma.timetable.permission.C2D_MESSAGE" />
 
     <application
@@ -20,14 +21,18 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:icon,android:allowBackup">
-        <activity android:name=".activity.StreamChooserActivity">
+        <activity
+            android:name=".activity.StreamChooserActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.TimeTableActivity" />
+        <activity
+            android:name=".activity.TimeTableActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
 
         <receiver
             android:name="com.google.android.gms.gcm.GcmReceiver"
@@ -35,6 +40,7 @@
             android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+
                 <category android:name="com.gnirt69.gcmexample" />
             </intent-filter>
         </receiver>
@@ -46,7 +52,6 @@
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
             </intent-filter>
         </service>
-
         <service
             android:name=".gcm.GCMRegistrationIntentService"
             android:exported="false">
@@ -55,6 +60,15 @@
             </intent-filter>
         </service>
 
+        <activity
+            android:name=".activity.SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".activity.TimeTableActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.fancy.packagename.rohansharma.timetable.activity.TimeTableActivity" />
+        </activity>
     </application>
 
 </manifest>

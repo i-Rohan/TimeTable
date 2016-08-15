@@ -1,6 +1,7 @@
 package com.fancy.packagename.rohansharma.timetable.gcm;
 
 import android.app.Notification;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
@@ -65,17 +66,19 @@ public class GCMPushReceiverService extends GcmListenerService {
                 '\'' + subject + "'," +
                 '\'' + endDatetime + "');");
 
-        PugNotification.with(getApplicationContext())
-                .load()
-                .title(title)
-                .bigTextStyle(stream + '\n' + date + '\n' + time + '\n' + subject, "BMU Time Table")
-                .smallIcon(R.drawable.notification_icon)
-                .largeIcon(R.mipmap.ic_launcher)
-                .flags(Notification.DEFAULT_ALL)
-                .click(TimeTableActivity.class)
-                .color(R.color.colorAccent)
-                .autoCancel(true)
-                .simple()
-                .build();
+        SharedPreferences sharedPreferences = getSharedPreferences("Settings", MODE_PRIVATE);
+        if (sharedPreferences.getBoolean("gcm", false))
+            PugNotification.with(getApplicationContext())
+                    .load()
+                    .title(title)
+                    .bigTextStyle(stream + '\n' + date + '\n' + time + '\n' + subject, "BMU Time Table")
+                    .smallIcon(R.drawable.notification_icon)
+                    .largeIcon(R.mipmap.ic_launcher)
+                    .flags(Notification.DEFAULT_ALL)
+                    .click(TimeTableActivity.class)
+                    .color(R.color.colorAccent)
+                    .autoCancel(true)
+                    .simple()
+                    .build();
     }
 }

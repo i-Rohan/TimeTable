@@ -18,6 +18,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -47,6 +48,8 @@ import com.fancy.packagename.rohansharma.timetable.commons.AppCommons;
 import com.fancy.packagename.rohansharma.timetable.gcm.GCMRegistrationIntentService;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.kennyc.bottomsheet.BottomSheet;
+import com.kennyc.bottomsheet.BottomSheetListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -769,7 +772,7 @@ public class TimeTableActivity extends AppCompatActivity {
             case R.id.action_share_app:
                 intent = new Intent(Intent.ACTION_SEND);
                 intent.setType("text/plain");
-                intent.putExtra(Intent.EXTRA_TEXT, "https://github.com/i-Rohan/TimeTable/releases/download/v0.52-alpha/BMU_Time_Table_v0.52-alpha.apk");
+                intent.putExtra(Intent.EXTRA_TEXT, "https://github.com/i-Rohan/TimeTable/releases/download/v0.53-alpha/BMU_Time_Table_v0.53-alpha.apk");
                 startActivity(Intent.createChooser(intent, "Share Via..."));
                 return true;
             case R.id.actioon_share_timetable:
@@ -786,8 +789,45 @@ public class TimeTableActivity extends AppCompatActivity {
                 } else
                     Toast.makeText(this, "Cannot share on this device! :(", Toast.LENGTH_SHORT).show();
                 return true;
+            case R.id.action_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    public void onClickStream(View v) {
+        new BottomSheet.Builder(this)
+                .setSheet(R.menu.options_menu)
+                .setTitle("Options")
+                .setListener(new BottomSheetListener() {
+                    @Override
+                    public void onSheetShown(@NonNull BottomSheet bottomSheet) {
+
+                    }
+
+                    @Override
+                    public void onSheetItemSelected(@NonNull BottomSheet bottomSheet,
+                                                    MenuItem menuItem) {
+                        if ("change stream".equalsIgnoreCase(menuItem.getTitle()
+                                .toString())) {
+                            SharedPreferences.Editor editor = getSharedPreferences(SIGN_IN,
+                                    MODE_PRIVATE).edit();
+                            editor.remove(SIGNED_IN);
+                            editor.remove(STREAM);
+                            editor.apply();
+                            startActivity(new Intent(TimeTableActivity.this,
+                                    StreamChooserActivity.class));
+                            finish();
+                        }
+                    }
+
+                    @Override
+                    public void onSheetDismissed(@NonNull BottomSheet bottomSheet, int i) {
+
+                    }
+                })
+                .show();
     }
 }
