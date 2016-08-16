@@ -4,6 +4,7 @@ import android.app.Notification;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.fancy.packagename.rohansharma.timetable.R;
 import com.fancy.packagename.rohansharma.timetable.activity.MainActivity;
@@ -29,7 +30,7 @@ public class GCMPushReceiverService extends GcmListenerService {
             String subject = jsonObject.getString("subject");
             String endDatetime = jsonObject.getString("end_datetime");
 
-//            Log.d("END", endDatetime);
+            Log.d("GCM", "received");
 
             sendNotification(title, stream, date, time, subject, endDatetime);
         } catch (JSONException e) {
