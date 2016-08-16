@@ -42,7 +42,7 @@ public class StreamChooserActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences(SIGN_IN, Context.MODE_PRIVATE);
         if (sharedPreferences.getBoolean(SIGNED_IN, false)) {
             stream = sharedPreferences.getInt(STREAM, 0);
-            startActivity(new Intent(this, TimeTableActivity.class));
+            startActivity(new Intent(this, MainActivity.class));
             finish();
             return;
         }
@@ -61,7 +61,7 @@ public class StreamChooserActivity extends AppCompatActivity {
         editor.putInt(STREAM, spinner.getSelectedItemPosition());
         editor.apply();
         stream = spinner.getSelectedItemPosition();
-        startActivity(new Intent(this, TimeTableActivity.class));
+        startActivity(new Intent(this, MainActivity.class));
         finish();
     }
 

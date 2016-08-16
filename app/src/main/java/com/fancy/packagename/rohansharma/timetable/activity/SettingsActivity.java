@@ -21,8 +21,6 @@ public class SettingsActivity extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
-
         switch1 = (Switch) findViewById(R.id.switch1);
 
         SharedPreferences sharedPreferences = getSharedPreferences("Settings", MODE_PRIVATE);

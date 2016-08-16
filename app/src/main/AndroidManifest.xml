@@ -30,9 +30,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".activity.TimeTableActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
 
         <receiver
             android:name="com.google.android.gms.gcm.GcmReceiver"
@@ -62,13 +59,15 @@
 
         <activity
             android:name=".activity.SettingsActivity"
-            android:label="@string/title_activity_settings"
-            android:parentActivityName=".activity.TimeTableActivity"
+            android:parentActivityName=".activity.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.fancy.packagename.rohansharma.timetable.activity.TimeTableActivity" />
+                android:value="com.fancy.packagename.rohansharma.timetable.activity.MainActivity" />
         </activity>
+        <activity
+            android:name=".activity.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>

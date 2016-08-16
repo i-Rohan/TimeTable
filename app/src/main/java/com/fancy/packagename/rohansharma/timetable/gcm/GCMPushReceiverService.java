@@ -4,10 +4,9 @@ import android.app.Notification;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.fancy.packagename.rohansharma.timetable.R;
-import com.fancy.packagename.rohansharma.timetable.activity.TimeTableActivity;
+import com.fancy.packagename.rohansharma.timetable.activity.MainActivity;
 import com.google.android.gms.gcm.GcmListenerService;
 
 import org.json.JSONException;
@@ -30,7 +29,7 @@ public class GCMPushReceiverService extends GcmListenerService {
             String subject = jsonObject.getString("subject");
             String endDatetime = jsonObject.getString("end_datetime");
 
-            Log.d("END", endDatetime);
+//            Log.d("END", endDatetime);
 
             sendNotification(title, stream, date, time, subject, endDatetime);
         } catch (JSONException e) {
@@ -75,7 +74,7 @@ public class GCMPushReceiverService extends GcmListenerService {
                     .smallIcon(R.drawable.notification_icon)
                     .largeIcon(R.mipmap.ic_launcher)
                     .flags(Notification.DEFAULT_ALL)
-                    .click(TimeTableActivity.class)
+                    .click(MainActivity.class)
                     .color(R.color.colorAccent)
                     .autoCancel(true)
                     .simple()

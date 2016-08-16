@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/overlay">
+    android:layout_height="match_parent">
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
@@ -14,9 +13,7 @@
             android:layout_height="match_parent"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_below="@+id/stream"
-            android:elevation="5dp"
-            android:translationZ="5dp">
+            android:layout_below="@+id/stream">
 
 
             <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -54,7 +51,7 @@
             android:padding="16dp"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:translationZ="5dp"
-            android:visibility="gone" />
+            android:visibility="visible" />
 
         <TextView
             android:id="@+id/stream"
@@ -65,25 +62,10 @@
             android:layout_marginTop="16dp"
             android:background="@drawable/button_bg"
             android:elevation="5dp"
+            android:onClick="onClickStream"
             android:padding="5dp"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="#fff"
-            android:translationZ="5dp"
-            android:onClick="onClickStream" />
-
-        <ListView
-            android:id="@+id/listView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@+id/updated"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="25dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/border2"
-            android:elevation="5dp"
-            android:padding="16dp"
             android:translationZ="5dp" />
 
     </RelativeLayout>

@@ -3,7 +3,6 @@ package com.fancy.packagename.rohansharma.timetable.gcm;
 import android.app.IntentService;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 
 import com.fancy.packagename.rohansharma.timetable.R;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
@@ -39,18 +38,18 @@ public class GCMRegistrationIntentService extends IntentService {
 
             //Displaying the token in the log so that we can copy it to send push notification
             //You can also extend the app by storing the token in to your server
-            Log.w("GCMRegIntentService", "token:" + token);
+//            Log.w("GCMRegIntentService", "token:" + token);
 
             //on registration complete creating intent with success
             registrationComplete = new Intent(REGISTRATION_SUCCESS);
 
             //Putting the token to the intent
-            registrationComplete.putExtra("token", token);
+//            registrationComplete.putExtra("token", token);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (RuntimeException ignored) {
             //If any error occurred
-            Log.w("GCMRegIntentService", "Registration error");
+//            Log.w("GCMRegIntentService", "Registration error");
             registrationComplete = new Intent(REGISTRATION_ERROR);
         }
 
