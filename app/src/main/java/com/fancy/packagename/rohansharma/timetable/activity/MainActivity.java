@@ -1,5 +1,7 @@
 package com.fancy.packagename.rohansharma.timetable.activity;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -49,6 +51,8 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
@@ -101,11 +105,22 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (intent.getAction().equals(GCMRegistrationIntentService.REGISTRATION_SUCCESS)) {
-                    String token = intent.getStringExtra("token");
+                    final String token = intent.getStringExtra("token");
 
                     Log.d("GCM Token", token);
 
-                    putGCMToken(token);
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            putGCMToken(token);
+                        }
+                    }, 1000);
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            putAnalytics(token);
+                        }
+                    }, 1500);
                 } else if (intent.getAction().equals(
                         GCMRegistrationIntentService.REGISTRATION_ERROR)) {
                     Toast.makeText(getApplicationContext(), "GCM registration error!",
@@ -216,6 +231,27 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public String getUsername() {
+        AccountManager manager = AccountManager.get(this);
+        Account[] accounts = manager.getAccountsByType("com.google");
+        List<String> possibleEmails = new LinkedList<String>();
+
+        for (Account account : accounts) {
+            // TODO: Check possibleEmail against an email regex or treat
+            // account.name as an email address only for certain account.type values.
+            possibleEmails.add(account.name);
+        }
+
+        if (!possibleEmails.isEmpty() && (possibleEmails.get(0) != null)) {
+            String email = possibleEmails.get(0);
+            String[] parts = email.split("@");
+
+            if (parts.length > 1)
+                return parts[0];
+        }
+        return null;
+    }
+
     protected void putGCMToken(final String token) {
         String url = API_URL + "putGCMToken.php";
 
@@ -237,6 +273,8 @@ public class MainActivity extends AppCompatActivity {
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
                 params.put("token", token);
+                params.put("username", getUsername());
+                Log.d("username", getUsername());
                 return params;
             }
         };
@@ -356,6 +394,37 @@ public class MainActivity extends AppCompatActivity {
                     }
                 })
                 .show();
+    }
+
+    protected void putAnalytics(final String token) {
+        String url = API_URL + "putAnalytics.php";
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d("putAnalytics", ' ' + response);
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("putAnalytics", "error");
+                    }
+                }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                params.put("token", token);
+                params.put("username", getUsername());
+                params.put("time", String.valueOf(System.currentTimeMillis()));
+                return params;
+            }
+        };
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(stringRequest);
     }
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {

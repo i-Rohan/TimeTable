@@ -85,7 +85,7 @@ public class NotificationsFragment extends Fragment {
             sqLiteDatabase.close();
             String values[] = list.toArray(new String[list.size()]);
             ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
-                    android.R.layout.simple_list_item_2, android.R.id.text2, values);
+                    android.R.layout.simple_list_item_2, android.R.id.text1, values);
             listView.setAdapter(adapter);
         } else {
             listView.setVisibility(View.GONE);
