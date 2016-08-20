@@ -5,7 +5,8 @@
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:paddingBottom="?android:attr/actionBarSize">
 
         <HorizontalScrollView xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/sv"
@@ -48,12 +49,14 @@
             android:id="@+id/updated"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/sv"
-            android:layout_centerHorizontal="true"
             android:elevation="5dp"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:translationZ="5dp"
-            android:visibility="visible" />
+            android:visibility="visible"
+            android:text="dtjndtjdtjd"
+            android:padding="16dp"
+            android:layout_below="@+id/sat"
+            android:layout_centerHorizontal="true" />
 
         <TextView
             android:id="@+id/stream"
@@ -62,13 +65,41 @@
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="16dp"
-            android:background="@drawable/button_bg"
+            android:background="@drawable/button_bg1"
             android:elevation="5dp"
-            android:onClick="onClickStream"
             android:padding="5dp"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="#fff"
             android:translationZ="5dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sat"
+            android:id="@+id/sat_header"
+            android:layout_below="@+id/sv"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginLeft="16dp"
+            android:padding="10dp"
+            android:background="@drawable/border4"
+            android:textColor="#fff"
+            android:layout_marginTop="5dp"
+            android:elevation="2dp"
+            android:translationZ="2dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/sat"
+            android:padding="10dp"
+            android:background="@drawable/border2"
+            android:layout_alignTop="@+id/sat_header"
+            android:layout_toRightOf="@+id/sat_header"
+            android:layout_toEndOf="@+id/sat_header"
+            android:textColor="#000"
+            android:elevation="2dp"
+            android:translationZ="2dp" />
 
     </RelativeLayout>
 </ScrollView>

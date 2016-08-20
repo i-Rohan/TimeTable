@@ -15,13 +15,13 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.res.ResourcesCompat;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.HorizontalScrollView;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -71,8 +71,8 @@ public class TimeTableFragment extends Fragment {
     TextView updated;
     boolean timeTableExists;
     TextView stream;
-    ListView listView;
     HorizontalScrollView sv;
+    TextView sat, satHeader;
 
     public TimeTableFragment() {
     }
@@ -87,6 +87,44 @@ public class TimeTableFragment extends Fragment {
         updated = (TextView) v.findViewById(R.id.updated);
         stream = (TextView) v.findViewById(R.id.stream);
         sv = (HorizontalScrollView) v.findViewById(R.id.sv);
+        sat = (TextView) v.findViewById(R.id.sat);
+        satHeader = (TextView) v.findViewById(R.id.sat_header);
+
+        stream.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new BottomSheet.Builder(getActivity())
+                        .setSheet(R.menu.options_menu)
+                        .setTitle("Options")
+                        .setListener(new BottomSheetListener() {
+                            @Override
+                            public void onSheetShown(@NonNull BottomSheet bottomSheet) {
+
+                            }
+
+                            @Override
+                            public void onSheetItemSelected(@NonNull BottomSheet bottomSheet,
+                                                            MenuItem menuItem) {
+                                if ("change stream".equalsIgnoreCase(menuItem.getTitle()
+                                        .toString())) {
+                                    SharedPreferences.Editor editor = getActivity().
+                                            getSharedPreferences(SIGN_IN, Context.MODE_PRIVATE).edit();
+                                    editor.remove(SIGNED_IN);
+                                    editor.remove(STREAM);
+                                    editor.apply();
+                                    startActivity(new Intent(getActivity(), StreamChooserActivity.class));
+                                    getActivity().finish();
+                                }
+                            }
+
+                            @Override
+                            public void onSheetDismissed(@NonNull BottomSheet bottomSheet, int i) {
+
+                            }
+                        })
+                        .show();
+            }
+        });
 
         if (stream != null) {
             stream.setText(STREAMS[AppCommons.stream]);
@@ -268,12 +306,21 @@ public class TimeTableFragment extends Fragment {
                         .MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
             }
 
-            getTimeTableData();
-        } else {
+            SQLiteDatabase sqLiteDatabase = SQLiteDatabase.openDatabase("/data/data/" + '/' +
+                            getActivity().getPackageName() + "/databases/timetable", null,
+                    SQLiteDatabase.OPEN_READONLY);
+            Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM TimeTable WHERE STREAM='" +
+                    STREAMS[AppCommons.stream] + "' AND DAY=5", null);
+            cursor.moveToFirst();
+
+            sat.setText(cursor.getString(2));
+
+            cursor.close();
+            sqLiteDatabase.close();
+        } else
             timeTableExists = false;
 
-            getTimeTableData();
-        }
+        getTimeTableData();
 
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -297,8 +344,8 @@ public class TimeTableFragment extends Fragment {
             myDir.mkdirs();
         File file = new File(myDir, fname);
 //        Log.i("File name", String.valueOf(file));
-//        if (file.exists())
-//            file.delete();
+        if (file.exists())
+            file.delete();
         try {
             FileOutputStream out = new FileOutputStream(file);
             bmp.compress(Bitmap.CompressFormat.JPEG, 100, out);
@@ -346,10 +393,31 @@ public class TimeTableFragment extends Fragment {
                 TextView textView = (TextView) v.findViewById(DAY_IDS[i]);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                     if (textView != null) {
-                        textView.setBackground(ResourcesCompat.getDrawable(
-                                getResources(), R.drawable.border1, null));
+                        textView.setBackground(ResourcesCompat.getDrawable(getResources(),
+                                R.drawable.border1, null));
                     }
                 }
+            }
+
+            satHeader.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.border1,
+                    null));
+
+            for (int i = 0; i < 5; i++) {
+                SQLiteDatabase sqLiteDatabase = SQLiteDatabase.openDatabase("/data/data/" + '/' +
+                                getActivity().getPackageName() + "/databases/timetable", null,
+                        SQLiteDatabase.OPEN_READONLY);
+                Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM TimeTable WHERE STREAM='" +
+                        STREAMS[AppCommons.stream] + "' AND DAY=" + i, null);
+                cursor.moveToFirst();
+
+                for (int k = 2; k < 10; k++) {
+                    TextView period = (TextView) v.findViewById((DAY_IDS[i] + k)
+                            - 1);
+                    period.setBackground(ResourcesCompat.getDrawable(
+                            getResources(), R.drawable.border2, null));
+                }
+                cursor.close();
+                sqLiteDatabase.close();
             }
 
             Calendar calendar = Calendar.getInstance();
@@ -360,7 +428,7 @@ public class TimeTableFragment extends Fragment {
 
             for (int i = 9; i <= 16; i++) {
                 if (i == 9) {
-                    if ((time.compareTo("09:30") >= 0) && (time.compareTo("10:30") <= 0)) {
+                    if ((time.compareTo("09:30") >= 0) && (time.compareTo("10:30") < 0)) {
                         TextView textView = (TextView) v.findViewById(PERIOD_IDS[0]);
                         temp1 = PERIOD_IDS[0];
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
@@ -373,7 +441,7 @@ public class TimeTableFragment extends Fragment {
                             }
                         }
                     }
-                } else if ((time.compareTo(i + ":30") >= 0) && (time.compareTo((i + 1) + ":30") <= 0)) {
+                } else if ((time.compareTo(i + ":30") >= 0) && (time.compareTo((i + 1) + ":30") < 0)) {
                     TextView textView = (TextView) v.findViewById(PERIOD_IDS[i - 9]);
                     temp1 = PERIOD_IDS[i - 9];
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
@@ -390,6 +458,7 @@ public class TimeTableFragment extends Fragment {
 
             Calendar instance = Calendar.getInstance();
             int day = instance.get(Calendar.DAY_OF_WEEK);
+//            Log.d("day", String.valueOf(day));
             int temp2 = 0;
             for (int i = 0; i < 5; i++) {
                 if (day == (i + 2)) {
@@ -397,14 +466,20 @@ public class TimeTableFragment extends Fragment {
                     temp2 = DAY_IDS[i];
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                         if (textView != null) {
-                            textView.setBackground(ResourcesCompat.getDrawable(
-                                    getResources(), R.drawable.border3, null));
+                            textView.setBackground(ResourcesCompat.getDrawable(getResources(),
+                                    R.drawable.border3, null));
                         }
                         if (textView != null) {
                             textView.setTextColor(Color.WHITE);
                         }
                     }
                 }
+            }
+
+            if (day == 7) {
+                satHeader.setBackground(ResourcesCompat.getDrawable(getResources(),
+                        R.drawable.border5, null));
+                satHeader.setTextColor(Color.WHITE);
             }
 
             if ((temp1 >= 3) && (temp1 <= 10) && (temp2 >= 12) && (temp2 <= 52)) {
@@ -429,7 +504,7 @@ public class TimeTableFragment extends Fragment {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-//                        Log.d("timetable", ' ' + response);
+                        Log.d("timetable", ' ' + response);
 
                         timeTable = getActivity().openOrCreateDatabase("timetable",
                                 Context.MODE_PRIVATE, null);
@@ -457,7 +532,36 @@ public class TimeTableFragment extends Fragment {
                             editor.putLong("updated", System.currentTimeMillis());
                             editor.apply();
                             updated.setText("Last synced: Today");
-                            if (!timeTableExists) {
+                            if (timeTableExists) {
+                                for (int i = 0; i < 5; i++) {
+                                    SQLiteDatabase sqLiteDatabase = SQLiteDatabase.openDatabase("/data/data/" + '/' +
+                                                    getActivity().getPackageName() + "/databases/timetable", null,
+                                            SQLiteDatabase.OPEN_READONLY);
+                                    Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM TimeTable WHERE STREAM='" +
+                                            STREAMS[AppCommons.stream] + "' AND DAY=" + i, null);
+                                    cursor.moveToFirst();
+
+                                    for (int k = 2; k < 10; k++) {
+                                        TextView period = (TextView) v.findViewById((DAY_IDS[i] + k)
+                                                - 1);
+                                        period.setText(cursor.getString(k));
+                                    }
+                                    cursor.close();
+                                    sqLiteDatabase.close();
+                                }
+
+                                SQLiteDatabase sqLiteDatabase = SQLiteDatabase.openDatabase("/data/data/" + '/' +
+                                                getActivity().getPackageName() + "/databases/timetable", null,
+                                        SQLiteDatabase.OPEN_READONLY);
+                                Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM TimeTable WHERE STREAM='" +
+                                        STREAMS[AppCommons.stream] + "' AND DAY=5", null);
+                                cursor.moveToFirst();
+
+                                sat.setText(cursor.getString(2));
+
+                                cursor.close();
+                                sqLiteDatabase.close();
+                            } else {
                                 startActivity(getActivity().getIntent());
                                 getActivity().finish();
                             }

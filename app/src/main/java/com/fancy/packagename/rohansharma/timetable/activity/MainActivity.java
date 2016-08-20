@@ -15,7 +15,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -27,7 +26,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -42,8 +40,6 @@ import com.fancy.packagename.rohansharma.timetable.fragment.TimeTableFragment;
 import com.fancy.packagename.rohansharma.timetable.gcm.GCMRegistrationIntentService;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.kennyc.bottomsheet.BottomSheet;
-import com.kennyc.bottomsheet.BottomSheetListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -60,6 +56,7 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 import static cn.pedant.SweetAlert.SweetAlertDialog.WARNING_TYPE;
 import static com.fancy.packagename.rohansharma.timetable.commons.AppCommons.API_URL;
 import static com.fancy.packagename.rohansharma.timetable.commons.AppCommons.DOWNLOAD_URL;
+import static com.fancy.packagename.rohansharma.timetable.commons.AppCommons.FIRST_LAUNCH;
 import static com.fancy.packagename.rohansharma.timetable.commons.AppCommons.SIGNED_IN;
 import static com.fancy.packagename.rohansharma.timetable.commons.AppCommons.SIGN_IN;
 import static com.fancy.packagename.rohansharma.timetable.commons.AppCommons.STREAM;
@@ -86,6 +83,17 @@ public class MainActivity extends AppCompatActivity {
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
+
+        SharedPreferences sharedPreferences = getSharedPreferences("v0.55-alpha", MODE_PRIVATE);
+        if (sharedPreferences.getBoolean(FIRST_LAUNCH, true)) {
+            File file = new File("/data/data/" + getPackageName() + "/databases/timetable");
+            if (file.exists())
+                file.delete();
+        }
+
+        SharedPreferences.Editor editor = getSharedPreferences("v0.55-alpha", MODE_PRIVATE).edit();
+        editor.putBoolean(FIRST_LAUNCH, false);
+        editor.apply();
 
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -136,8 +144,8 @@ public class MainActivity extends AppCompatActivity {
                 getApplicationContext());
 
         if (ConnectionResult.SUCCESS == resultCode) {
-            Intent itent = new Intent(this, GCMRegistrationIntentService.class);
-            startService(itent);
+            Intent intent = new Intent(this, GCMRegistrationIntentService.class);
+            startService(intent);
         } else {
             if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
                 Toast.makeText(getApplicationContext(), "Google Play Service is not " +
@@ -234,20 +242,15 @@ public class MainActivity extends AppCompatActivity {
     public String getUsername() {
         AccountManager manager = AccountManager.get(this);
         Account[] accounts = manager.getAccountsByType("com.google");
-        List<String> possibleEmails = new LinkedList<String>();
+        List<String> possibleEmails = new LinkedList<>();
 
-        for (Account account : accounts) {
-            // TODO: Check possibleEmail against an email regex or treat
-            // account.name as an email address only for certain account.type values.
+        for (Account account : accounts)
             possibleEmails.add(account.name);
-        }
 
         if (!possibleEmails.isEmpty() && (possibleEmails.get(0) != null)) {
             String email = possibleEmails.get(0);
-            String[] parts = email.split("@");
 
-            if (parts.length > 1)
-                return parts[0];
+            return email.isEmpty() ? "null" : email;
         }
         return null;
     }
@@ -361,39 +364,6 @@ public class MainActivity extends AppCompatActivity {
 
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         requestQueue.add(stringRequest);
-    }
-
-    public void onClickStream(View v) {
-        new BottomSheet.Builder(this)
-                .setSheet(R.menu.options_menu)
-                .setTitle("Options")
-                .setListener(new BottomSheetListener() {
-                    @Override
-                    public void onSheetShown(@NonNull BottomSheet bottomSheet) {
-
-                    }
-
-                    @Override
-                    public void onSheetItemSelected(@NonNull BottomSheet bottomSheet,
-                                                    MenuItem menuItem) {
-                        if ("change stream".equalsIgnoreCase(menuItem.getTitle()
-                                .toString())) {
-                            SharedPreferences.Editor editor = getSharedPreferences(SIGN_IN,
-                                    MODE_PRIVATE).edit();
-                            editor.remove(SIGNED_IN);
-                            editor.remove(STREAM);
-                            editor.apply();
-                            startActivity(new Intent(MainActivity.this, StreamChooserActivity.class));
-                            finish();
-                        }
-                    }
-
-                    @Override
-                    public void onSheetDismissed(@NonNull BottomSheet bottomSheet, int i) {
-
-                    }
-                })
-                .show();
     }
 
     protected void putAnalytics(final String token) {
