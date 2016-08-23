@@ -389,6 +389,8 @@ public class MainActivity extends AppCompatActivity {
                 params.put("token", token);
                 params.put("username", getUsername());
                 params.put("time", String.valueOf(System.currentTimeMillis()));
+                SharedPreferences sharedPreferences = getSharedPreferences(SIGN_IN, MODE_PRIVATE);
+                params.put("stream", String.valueOf(sharedPreferences.getInt("stream", 0)));
                 return params;
             }
         };

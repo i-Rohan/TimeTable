@@ -17,6 +17,8 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
+        setTitle("Settings");
+
         overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);

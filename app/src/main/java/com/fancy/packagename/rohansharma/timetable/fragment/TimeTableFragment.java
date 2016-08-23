@@ -285,7 +285,7 @@ public class TimeTableFragment extends Fragment {
                 }
                 day.setTextColor(Color.WHITE);
                 day.setText(DAYS[i]);
-                day.setPadding(16, 16, 16, 16);
+                day.setPadding(15, 15, 15, 15);
                 tr.addView(day);
 
                 for (int k = 2; k < 10; k++) {
@@ -297,7 +297,7 @@ public class TimeTableFragment extends Fragment {
                     }
                     period.setTextColor(Color.BLACK);
                     period.setText(cursor.getString(k));
-                    period.setPadding(16, 16, 16, 16);
+                    period.setPadding(15, 15, 15, 15);
                     tr.addView(period);
                 }
                 cursor.close();
@@ -317,8 +317,10 @@ public class TimeTableFragment extends Fragment {
 
             cursor.close();
             sqLiteDatabase.close();
-        } else
+        } else {
             timeTableExists = false;
+            sv.setVisibility(View.GONE);
+        }
 
         getTimeTableData();
 
@@ -399,7 +401,7 @@ public class TimeTableFragment extends Fragment {
                 }
             }
 
-            satHeader.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.border1,
+            satHeader.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.border4,
                     null));
 
             for (int i = 0; i < 5; i++) {
@@ -415,6 +417,7 @@ public class TimeTableFragment extends Fragment {
                             - 1);
                     period.setBackground(ResourcesCompat.getDrawable(
                             getResources(), R.drawable.border2, null));
+                    period.setTextColor(Color.BLACK);
                 }
                 cursor.close();
                 sqLiteDatabase.close();
