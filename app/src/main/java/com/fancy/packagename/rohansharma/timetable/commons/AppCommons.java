@@ -15,5 +15,5 @@ public class AppCommons {
     public static final String FIRST_LAUNCH = "first_launch";
     public static int stream;
     public static String DOWNLOAD_URL = "https://github.com/i-Rohan/TimeTable/releases/download/" +
-            "v0.55-alpha/BMU_Time_Table_v0.55-alpha.apk";
+            "v0.56-alpha/BMU_Time_Table_v0.56-alpha.apk";
 }

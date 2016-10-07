@@ -1,4 +1,4 @@
-package com.fancy.packagename.rohansharma.timetable.gcm;
+package com.tnine.ourcesu.gcm;
 
 import android.content.Intent;
 
